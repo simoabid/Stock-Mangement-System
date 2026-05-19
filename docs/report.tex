@@ -1,0 +1,428 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tcolorbox}
+\usepackage{amsmath}
+
+% Configuration de la mise en page
+\geometry{hmargin=2.5cm,vmargin=2.5cm}
+
+% Couleurs personnalisées
+\definecolor{primary}{RGB}{13, 148, 136} % Teal officiel du projet (PharmStock)
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{notebox}{RGB}{236, 253, 245}
+\definecolor{noteborder}{RGB}{16, 185, 129}
+
+% Configuration des hyperliens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    filecolor=magenta,      
+    urlcolor=primary,
+    pdftitle={Rapport Complet Projet PharmStock},
+    pdfpagemode=FullScreen,
+}
+
+% Configuration du code source
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\newtcolorbox{infobox}{
+  colback=notebox,
+  colframe=noteborder,
+  coltext=black,
+  boxsep=5pt,
+  left=5pt,
+  right=5pt,
+  top=5pt,
+  bottom=5pt,
+  arc=0pt,
+  boxrule=1pt,
+  title=\textbf{Note Technique}
+}
+
+
+% En-tête et pied de page
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{PharmStock}}
+\rhead{Rapport Technique Détaillé}
+\cfoot{\thepage}
+
+% Page de garde personnalisée
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \begin{figure}[H]
+             \centering
+             \includegraphics[width=0.4\textwidth]{screenshots/logo_placeholder.png}
+        \end{figure}
+        
+        \vspace{1cm}
+        
+        \Huge
+        \textbf{\color{primary}PharmStock}
+        
+        \vspace{0.5cm}
+        \LARGE
+        Développement d'un Système de Gestion de Stock Pharmaceutique\\
+        Basé sur l'Architecture Jakarta EE
+        
+        \vspace{1.5cm}
+        
+        \textbf{Rapport Final \& Documentation Technique}
+        
+        \vfill
+        
+        \Large
+        \textbf{Réalisé par :} Mohamed Amine Abid \& El Alami Adnane Ahmed \& Youness Agrine \& Asmae \\
+        \vspace{0.2cm}
+        \textbf{Filière :} Ingénierie logicielle et Réseaux (ILR) \\
+        \vspace{0.2cm}
+        \textbf{Encadrant :} Soufiyan Ouali \\
+        \vspace{0.5cm}
+        \large
+        \today
+        
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\chapter{Introduction Générale}
+
+\section{Contexte et Motivation}
+La gestion d'une pharmacie hospitalière ou d'officine requiert une rigueur organisationnelle sans faille. Entre le suivi des stocks de médicaments, la traçabilité des entrées et sorties, la gestion des dates de péremption, les alertes de stock bas, et la conformité réglementaire, les pharmaciens se retrouvent souvent submergés par des tâches complexes et critiques pour la santé publique.
+
+Dans ce contexte, notre projet "PharmStock" se propose comme une solution informatique complète, visant à dématérialiser et automatiser l'ensemble de la gestion du stock pharmaceutique. Contrairement aux solutions propriétaires coûteuses, nous proposons ici une architecture ouverte, basée sur des standards robustes du monde Java (Jakarta EE), garantissant pérennité et maintenabilité.
+
+Ce projet s'inscrit également dans une démarche d'apprentissage approfondi des architectures n-tiers, mettant en œuvre des concepts avancés comme le MVC, le pattern DAO, et la gestion fine de la persistance des données avec pool de connexions (HikariCP).
+
+\section{Objectifs Détaillés du Projet}
+L'objectif n'est pas simplement de créer un site web, mais une véritable application métier pharmaceutique.
+\begin{enumerate}
+    \item \textbf{Gestion Centralisée du Stock :} Unifier le catalogue des produits pharmaceutiques, les fournisseurs, et les mouvements de stock (entrées/sorties).
+    \item \textbf{Traçabilité Complète :} Enregistrer chaque mouvement de stock avec numéro de lot, date de péremption, prix d'achat et de vente.
+    \item \textbf{Alertes Intelligentes :} Détection automatique des produits en rupture de stock, en stock bas, et des lots périmés ou bientôt périmés.
+    \item \textbf{Sécurisation des Accès :} Implémenter une politique de sécurité stricte avec contrôle d'accès basé sur les rôles (RBAC : Admin, Pharmacien, Technicien).
+    \item \textbf{Universalité :} Lever les barrières linguistiques grâce à un système d'internationalisation dynamique supportant le français, l'anglais et l'arabe (RTL).
+\end{enumerate}
+
+\section{Organisation du Rapport}
+Ce document est structuré comme suit :
+\begin{itemize}
+    \item Le \textbf{Chapitre 2} offre une visite guidée visuelle de l'application.
+    \item Le \textbf{Chapitre 3} détaille l'analyse fonctionnelle et les besoins.
+    \item Le \textbf{Chapitre 4} présente la conception de la base de données.
+    \item Le \textbf{Chapitre 5} plonge dans les détails de l'implémentation technique et les défis relevés.
+\end{itemize}
+
+\chapter{Interface et Navigation}
+\textit{Une interface utilisateur soigneusement conçue est la clé de l'adoption d'un logiciel. Voici une présentation détaillée des principaux écrans de l'application.}
+
+\section{Module Authentification}
+
+\subsection{Sécurité et Accès}
+La page de connexion est le point d'entrée unique pour tous les types d'utilisateurs. Elle intègre des mécanismes de sécurité via validation côté serveur et hachage BCrypt des mots de passe, garantissant la confidentialité des identifiants.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/login.png}} 
+    \caption{Interface de Connexion : Design épuré avec thème teal pharmaceutique.}
+    \label{fig:login}
+\end{figure}
+
+\subsection{Acquisition de Nouveaux Membres}
+Le formulaire d'inscription est conçu pour minimiser les frictions. Les nouveaux comptes sont créés avec le rôle Technicien par défaut, garantissant un accès minimal jusqu'à validation par un administrateur.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/register.png}}
+    \caption{Inscription : Création de compte avec rôle Technicien par défaut.}
+    \label{fig:register}
+\end{figure}
+
+\newpage
+\section{Module Tableau de Bord}
+
+\subsection{Vue d'Ensemble Opérationnelle}
+Le tableau de bord est le cœur de l'application. Il présente en temps réel les indicateurs clés : nombre total de produits, alertes de stock bas, lots périmés, et lots bientôt périmés (90 jours). Les tableaux d'activité récente montrent les dernières entrées et sorties de stock.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/dashboard.png}}
+    \caption{Tableau de bord : KPIs en temps réel et alertes critiques.}
+    \label{fig:dashboard}
+\end{figure}
+
+\subsection{Adaptabilité Visuelle (Dark Mode)}
+Pour le confort de lecture nocturne ou prolongée, un mode sombre global a été implémenté. Il inverse intelligemment les contrastes chromatiques tout en préservant la lisibilité.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/dark_mode.png}}
+    \caption{Mode Sombre : Réduction de la fatigue oculaire et élégance visuelle.}
+    \label{fig:darkmode}
+\end{figure}
+
+\newpage
+\section{Module Produits}
+
+\subsection{Catalogue Pharmaceutique}
+Le catalogue affiche les produits sous forme de cartes visuelles avec indication du stock en temps réel (badges vert/orange/rouge), catégorie, forme galénique, dosage et marqueur de prescription obligatoire (Rx). Un moteur de recherche avec filtre par catégorie facilite la navigation.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/products.png}}
+    \caption{Catalogue de produits : Grille visuelle avec indicateurs de stock.}
+    \label{fig:products}
+\end{figure}
+
+\section{Module Administration}
+
+\subsection{Gestion des Entrées de Stock}
+L'enregistrement des entrées de stock capture toutes les informations de traçabilité : fournisseur, quantité, prix d'achat et de vente, numéro de lot, date de péremption. Le stock du produit est automatiquement incrémenté.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/stock_entry.png}}
+    \caption{Formulaire d'entrée de stock : Traçabilité complète des approvisionnements.}
+    \label{fig:stock_entry}
+\end{figure}
+
+\subsection{Gestion des Sorties de Stock}
+Les sorties supportent plusieurs types : Vente, Retour fournisseur, Élimination (périmé), Endommagé, Usage interne. Le système vérifie automatiquement la disponibilité avant d'autoriser une sortie.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/stock_exit.png}}
+    \caption{Formulaire de sortie : Validation automatique du stock disponible.}
+    \label{fig:stock_exit}
+\end{figure}
+
+\subsection{Gestion des Fournisseurs et Catégories}
+L'interface permet de gérer les fournisseurs (nom, contact, téléphone, email, adresse) et les catégories de produits (Médicaments, Dispositifs médicaux, Compléments alimentaires, etc.) avec possibilité de désactivation sans suppression.
+
+\chapter{Analyse et Spécifications}
+
+\section{Acteurs et Rôles du Système}
+L'architecture de sécurité repose sur une distinction claire des privilèges.
+
+\begin{itemize}
+    \item \textbf{L'Administrateur (ADMIN) :} C'est le super-utilisateur. Il a accès à toutes les fonctionnalités : gestion des produits, fournisseurs, catégories, mouvements de stock, et gestion des utilisateurs (activation/désactivation).
+    \item \textbf{Le Pharmacien (PHARMACIST) :} C'est l'opérationnel. Il gère les entrées et sorties de stock, consulte les fournisseurs, et surveille les alertes. Il n'a pas accès à la gestion des catégories ni des utilisateurs.
+    \item \textbf{Le Technicien (TECHNICIAN) :} C'est le consultant. Il peut consulter le catalogue de produits et le tableau de bord, mais ne peut pas modifier les données de stock.
+\end{itemize}
+
+\section{Spécifications Fonctionnelles Détaillées (SFD)}
+
+\subsection{SFD-01 : Gestion des Identités}
+\begin{itemize}
+    \item Le système doit permettre l'auto-inscription avec rôle Technicien par défaut.
+    \item Les mots de passe doivent être hachés via BCrypt avant stockage.
+    \item La session doit expirer après 30 minutes d'inactivité.
+    \item L'administrateur peut activer/désactiver des comptes utilisateurs.
+\end{itemize}
+
+\subsection{SFD-02 : Gestion du Stock Pharmaceutique}
+\begin{itemize}
+    \item \textbf{Produits :} Support des métadonnées pharmaceutiques (nom commercial, DCI, forme galénique, dosage, code-barres, unité de mesure, emplacement rayon).
+    \item \textbf{Entrées de stock :} Enregistrement avec fournisseur, lot, péremption, prix d'achat/vente.
+    \item \textbf{Sorties de stock :} Support de multiples types (vente, retour, élimination, endommagement, usage interne).
+    \item \textbf{Stock atomique :} Les mises à jour de stock doivent être thread-safe pour éviter les incohérences en cas d'accès concurrent.
+    \item \textbf{Alertes :} Détection automatique des stocks bas (en dessous du seuil minimum configurable) et des lots périmés/bientôt périmés.
+\end{itemize}
+
+\section{Exigences Non-Fonctionnelles}
+\begin{itemize}
+    \item \textbf{Performance :} Utilisation de HikariCP pour le pool de connexions, requêtes SQL optimisées avec pagination.
+    \item \textbf{Sécurité :} Protection OWASP (PreparedStatements contre l'injection SQL, filtre d'authentification global).
+    \item \textbf{Internationalisation :} Support de l'Arabe (RTL), du Français et de l'Anglais sans casser la mise en page.
+    \item \textbf{Déploiement :} Conteneurisation complète via Docker et Docker Compose pour un déploiement reproductible.
+\end{itemize}
+
+\chapter{Conception de la Base de Données}
+
+\section{Modélisation Conceptuelle}
+Nous utilisons un SGBD relationnel (MySQL 8.0) pour garantir l'intégrité ACID des transactions, critique pour la traçabilité pharmaceutique.
+
+\section{Dictionnaire des Données Détaillé}
+
+\subsection{Table \texttt{users} (Utilisateurs)}
+Stocke les identifiants et profils des utilisateurs du système.
+\begin{longtable}{|p{3cm}|p{2.5cm}|p{8cm}|}
+\hline
+\textbf{Attribut} & \textbf{Type SQL} & \textbf{Contrainte / Rôle} \\
+\hline
+\texttt{id} & INT & PK, Auto-Increment. Identifiant unique interne. \\
+\hline
+\texttt{username} & VARCHAR(50) & UNIQUE, Not Null. Login de connexion. \\
+\hline
+\texttt{password\_hash} & VARCHAR(255) & Stocke le hash BCrypt (jamais en clair). \\
+\hline
+\texttt{fullname} & VARCHAR(100) & Nom complet pour l'affichage. \\
+\hline
+\texttt{email} & VARCHAR(100) & UNIQUE. Adresse email de contact. \\
+\hline
+\texttt{role} & ENUM & Valeurs contraintes : 'ADMIN', 'PHARMACIST', 'TECHNICIAN'. \\
+\hline
+\texttt{is\_active} & BOOLEAN & Permet la désactivation sans suppression. \\
+\hline
+\end{longtable}
+
+\subsection{Table \texttt{products} (Produits Pharmaceutiques)}
+Le cœur du système de stock.
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{7.5cm}|}
+\hline
+\textbf{Attribut} & \textbf{Type SQL} & \textbf{Contrainte / Rôle} \\
+\hline
+\texttt{id} & INT & PK. \\
+\hline
+\texttt{name} & VARCHAR(255) & Nom commercial du produit. \\
+\hline
+\texttt{generic\_name} & VARCHAR(255) & DCI (Dénomination Commune Internationale). \\
+\hline
+\texttt{category\_id} & INT & FK vers \texttt{categories}. Classification du produit. \\
+\hline
+\texttt{form} & VARCHAR(50) & Forme galénique (Comprimé, Sirop, Injection...). \\
+\hline
+\texttt{dosage} & VARCHAR(50) & Dosage (ex: 500mg, 10mg/ml). \\
+\hline
+\texttt{barcode} & VARCHAR(100) & UNIQUE. Code-barres pour identification rapide. \\
+\hline
+\texttt{current\_stock} & INT & Stock actuel, mis à jour atomiquement. \\
+\hline
+\texttt{min\_stock\_level} & INT & Seuil d'alerte pour stock bas. \\
+\hline
+\end{longtable}
+
+\subsection{Tables de Mouvements de Stock}
+\begin{itemize}
+    \item \textbf{stock\_entries} : Enregistre les approvisionnements avec fournisseur (FK), quantité, prix, numéro de lot, et date de péremption.
+    \item \textbf{stock\_exits} : Enregistre les sorties avec type (SALE, RETURN\_TO\_SUPPLIER, EXPIRED\_DISPOSAL, DAMAGED, INTERNAL\_USE).
+    \item \textbf{categories} : Classification des produits (Médicament, Dispositif médical, etc.).
+    \item \textbf{suppliers} : Référentiel des fournisseurs avec informations de contact.
+\end{itemize}
+
+\chapter{Implémentation Technique Approfondie}
+
+\section{L'Architecture MVC sur Jakarta EE}
+Nous avons choisi de ne pas utiliser de Framework lourd (comme Spring) pour maîtriser les fondamentaux.
+
+\subsection{Contrôleurs (Servlets)}
+Chaque URL est mappée vers une Servlet spécifique (ex: \texttt{/dashboard} -> \texttt{DashboardServlet.java}).
+\begin{lstlisting}[language=Java, caption=Exemple de mappage Servlet]
+@WebServlet("/dashboard")
+public class DashboardServlet extends HttpServlet {
+    private ProductDAO productDAO;
+    private StockEntryDAO entryDAO;
+    private StockExitDAO exitDAO;
+    
+    protected void doGet(...) {
+        // Calcul des KPIs : stock bas, peremption, activite recente
+        // Set Attributes -> Forward JSP
+    }
+}
+\end{lstlisting}
+
+\subsection{Vues (JSP + JSTL)}
+Les vues sont totalement décorrélées de la logique. Nous utilisons JSTL (JavaServer Pages Standard Tag Library) pour la logique d'affichage (boucles, conditions) directement dans le HTML.
+
+\section{Défis Techniques et Solutions}
+
+\subsection{Gestion Atomique du Stock}
+\begin{infobox}
+\textbf{Le Problème :} Dans un environnement multi-utilisateurs, deux pharmaciens peuvent tenter de modifier le stock du même produit simultanément, causant des incohérences de données.
+\end{infobox}
+
+\textbf{Notre Solution :}
+Nous avons implémenté des mises à jour atomiques SQL qui modifient directement la valeur en base sans la lire d'abord côté Java :
+\begin{lstlisting}[language=SQL, caption=Mise à jour atomique du stock]
+UPDATE products SET current_stock = current_stock + ? WHERE id = ?
+\end{lstlisting}
+Cette approche élimine les conditions de course (race conditions) car le SGBD garantit la sérialisation des opérations sur la même ligne.
+
+\subsection{Internationalisation RTL (Arabe)}
+Le support de l'arabe ne se limite pas à la traduction. L'interface doit s'inverser (miroir).
+Notre solution utilise une variable de session \texttt{userLang}. Dans le header JSP, nous injectons dynamiquement la direction :
+\begin{lstlisting}[language=HTML]
+<html dir="${sessionScope.userLang == 'ar' ? 'rtl' : 'ltr'}">
+\end{lstlisting}
+Ceci, combiné à des variables CSS intelligentes, permet une bascule instantanée de toute l'interface.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.85\textwidth]{screenshots/rtl_arabic.png}}
+    \caption{Démonstration du moteur de rendu RTL.}
+    \label{fig:rtl}
+\end{figure}
+
+\subsection{Conteneurisation Docker}
+Le projet utilise un Dockerfile multi-étapes (Maven build + Tomcat runtime) et Docker Compose pour orchestrer l'application et la base de données MySQL, avec initialisation automatique du schéma via montage de volume.
+
+\section{Sécurité}
+L'application utilise un filtre global \texttt{AuthenticationFilter} qui intercepte chaque requête. Les routes \texttt{/admin/*} sont protégées et nécessitent au minimum le rôle PHARMACIST. Les routes de gestion des catégories et utilisateurs nécessitent le rôle ADMIN. Les mots de passe sont hachés via BCrypt, et toutes les requêtes SQL utilisent des PreparedStatements pour prévenir l'injection SQL.
+
+\chapter{Tests et Validation}
+Une phase de validation rigoureuse a été menée.
+
+\section{Plan de Test}
+\begin{longtable}{|l|p{6cm}|l|}
+\hline
+\textbf{Fonctionnalité} & \textbf{Scénario} & \textbf{Résultat} \\
+\hline
+Login & Mot de passe erroné & Refusé (OK) \\
+\hline
+Login & SQL Injection dans le champ user & Bloqué (OK) \\
+\hline
+Entrée Stock & Ajout de 100 unités & Stock incrémenté (OK) \\
+\hline
+Sortie Stock & Quantité > stock disponible & Rejeté (OK) \\
+\hline
+Alerte & Produit sous seuil minimum & Affiché au dashboard (OK) \\
+\hline
+I18n & Changement de langue FR->AR & Layout Inversé (OK) \\
+\hline
+Rôles & Technicien accède /admin/products & Redirigé (OK) \\
+\hline
+\end{longtable}
+
+\chapter{Conclusion et Perspectives}
+Ce projet a permis la réalisation d'un système complet de gestion de stock pharmaceutique, fonctionnel et robuste. Au-delà des fonctionnalités de base, l'intégration de concepts avancés comme la gestion atomique des stocks, les alertes automatiques de péremption, et l'internationalisation bidirectionnelle témoigne de la qualité technique du livrable.
+
+Pour l'avenir, l'architecture modulaire permettrait d'ajouter facilement :
+\begin{itemize}
+    \item Une couche \textbf{API REST} pour servir une application mobile de scan de code-barres.
+    \item Un système de \textbf{prédiction de consommation par IA} pour anticiper les réapprovisionnements.
+    \item Un module de \textbf{génération de rapports PDF} pour les inventaires réglementaires.
+    \item Une intégration avec les \textbf{systèmes de commande fournisseurs} pour automatiser les réapprovisionnements.
+\end{itemize}
+
+\end{document}

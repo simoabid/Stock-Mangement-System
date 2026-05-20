@@ -70,9 +70,23 @@ public class AdminStockExitServlet extends HttpServlet {
         exit.setUserId(user.getId());
         exit.setNotes(req.getParameter("notes"));
 
-        // Create exit & decrease stock
-        stockExitDAO.create(exit);
-        productDAO.updateStock(productId, -quantity);
+        // Create exit & decrease stock transactionally
+        try (java.sql.Connection conn = com.pharmacy.util.DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                stockExitDAO.create(exit, conn);
+                productDAO.updateStock(productId, -quantity, conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            req.setAttribute("error", "Failed to record stock exit: " + e.getMessage());
+            req.setAttribute("products", productDAO.findAll());
+            req.getRequestDispatcher("/WEB-INF/views/admin/stock_exit_form.jsp").forward(req, resp);
+            return;
+        }
 
         resp.sendRedirect(req.getContextPath() + "/admin/stock-exits?msg=recorded");
     }

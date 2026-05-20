@@ -25,25 +25,15 @@ public class ProductServlet extends HttpServlet {
             // Single product detail
             try {
                 int id = Integer.parseInt(idParam);
-                productDAO.findById(id).ifPresentOrElse(
-                    product -> {
-                        req.setAttribute("product", product);
-                        try {
-                            req.getRequestDispatcher("/WEB-INF/views/product_detail.jsp").forward(req, resp);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    },
-                    () -> {
-                        try {
-                            resp.sendError(404);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                );
+                java.util.Optional<Product> productOpt = productDAO.findById(id);
+                if (productOpt.isPresent()) {
+                    req.setAttribute("product", productOpt.get());
+                    req.getRequestDispatcher("/WEB-INF/views/product_detail.jsp").forward(req, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }
             } catch (NumberFormatException e) {
-                resp.sendError(400);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
             // Product list with search/filter

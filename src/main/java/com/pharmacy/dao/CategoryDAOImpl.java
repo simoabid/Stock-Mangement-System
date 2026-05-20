@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.Category;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class CategoryDAOImpl implements CategoryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find category by id: " + id, e);
         }
         return Optional.empty();
     }
@@ -38,7 +39,7 @@ public class CategoryDAOImpl implements CategoryDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all categories", e);
         }
         return list;
     }
@@ -57,7 +58,7 @@ public class CategoryDAOImpl implements CategoryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to create category: " + category.getName(), e);
         }
     }
 
@@ -71,7 +72,7 @@ public class CategoryDAOImpl implements CategoryDAO {
             stmt.setInt(3, category.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to update category: " + category.getId(), e);
         }
     }
 
@@ -83,7 +84,7 @@ public class CategoryDAOImpl implements CategoryDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to delete category: " + id, e);
         }
     }
 

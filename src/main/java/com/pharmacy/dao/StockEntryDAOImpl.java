@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.StockEntry;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all stock entries", e);
         }
         return list;
     }
@@ -52,7 +53,7 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find stock entries by product id: " + productId, e);
         }
         return list;
     }
@@ -75,7 +76,7 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find recent stock entries", e);
         }
         return list;
     }
@@ -99,7 +100,7 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find expiring stock entries", e);
         }
         return list;
     }
@@ -121,7 +122,7 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find expired stock entries", e);
         }
         return list;
     }
@@ -134,16 +135,24 @@ public class StockEntryDAOImpl implements StockEntryDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to count all stock entries", e);
         }
         return 0;
     }
 
     @Override
     public void create(StockEntry entry) {
+        try (Connection conn = DBConnection.getConnection()) {
+            create(entry, conn);
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to create stock entry for product: " + entry.getProductId(), e);
+        }
+    }
+
+    @Override
+    public void create(StockEntry entry, Connection conn) throws SQLException {
         String sql = "INSERT INTO stock_entries (product_id, supplier_id, quantity, purchase_price, selling_price, batch_number, expiry_date, entry_date, user_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, entry.getProductId());
             if (entry.getSupplierId() > 0) {
                 stmt.setInt(2, entry.getSupplierId());
@@ -164,8 +173,6 @@ public class StockEntryDAOImpl implements StockEntryDAO {
                     if (keys.next()) entry.setId(keys.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 

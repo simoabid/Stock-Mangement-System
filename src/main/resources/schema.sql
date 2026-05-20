@@ -55,7 +55,7 @@ CREATE TABLE products (
   description TEXT,
   image_path VARCHAR(255),
   min_stock_level INT DEFAULT 10,
-  current_stock INT DEFAULT 0,
+  current_stock INT DEFAULT 0 CHECK (current_stock >= 0),
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL

@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.StockExit;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class StockExitDAOImpl implements StockExitDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all stock exits", e);
         }
         return list;
     }
@@ -50,7 +51,7 @@ public class StockExitDAOImpl implements StockExitDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find stock exits by product id: " + productId, e);
         }
         return list;
     }
@@ -72,7 +73,7 @@ public class StockExitDAOImpl implements StockExitDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find recent stock exits", e);
         }
         return list;
     }
@@ -85,16 +86,24 @@ public class StockExitDAOImpl implements StockExitDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to count all stock exits", e);
         }
         return 0;
     }
 
     @Override
     public void create(StockExit exit) {
+        try (Connection conn = DBConnection.getConnection()) {
+            create(exit, conn);
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to create stock exit for product: " + exit.getProductId(), e);
+        }
+    }
+
+    @Override
+    public void create(StockExit exit, Connection conn) throws SQLException {
         String sql = "INSERT INTO stock_exits (product_id, quantity, exit_type, exit_date, user_id, notes) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, exit.getProductId());
             stmt.setInt(2, exit.getQuantity());
             stmt.setString(3, exit.getExitType().name());
@@ -107,8 +116,6 @@ public class StockExitDAOImpl implements StockExitDAO {
                     if (keys.next()) exit.setId(keys.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 

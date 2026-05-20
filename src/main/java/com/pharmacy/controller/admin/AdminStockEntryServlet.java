@@ -76,9 +76,24 @@ public class AdminStockEntryServlet extends HttpServlet {
         entry.setUserId(user.getId());
         entry.setNotes(req.getParameter("notes"));
 
-        // Create entry & update stock
-        stockEntryDAO.create(entry);
-        productDAO.updateStock(entry.getProductId(), entry.getQuantity());
+        // Create entry & update stock transactionally
+        try (java.sql.Connection conn = com.pharmacy.util.DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                stockEntryDAO.create(entry, conn);
+                productDAO.updateStock(entry.getProductId(), entry.getQuantity(), conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            req.setAttribute("error", "Failed to record stock entry: " + e.getMessage());
+            req.setAttribute("products", productDAO.findAll());
+            req.setAttribute("suppliers", supplierDAO.findAllActive());
+            req.getRequestDispatcher("/WEB-INF/views/admin/stock_entry_form.jsp").forward(req, resp);
+            return;
+        }
 
         resp.sendRedirect(req.getContextPath() + "/admin/stock-entries?msg=added");
     }

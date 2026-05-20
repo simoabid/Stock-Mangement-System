@@ -15,5 +15,6 @@ public interface ProductDAO {
     void create(Product product);
     void update(Product product);
     void updateStock(int productId, int quantityChange);
+    void updateStock(int productId, int quantityChange, java.sql.Connection conn) throws java.sql.SQLException;
     void delete(int id);
 }

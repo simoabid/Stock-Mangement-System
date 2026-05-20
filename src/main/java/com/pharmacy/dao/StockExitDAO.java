@@ -9,4 +9,5 @@ public interface StockExitDAO {
     List<StockExit> findRecent(int limit);
     int countAll();
     void create(StockExit exit);
+    void create(StockExit exit, java.sql.Connection conn) throws java.sql.SQLException;
 }

@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.User;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find user by id: " + id, e);
         }
         return Optional.empty();
     }
@@ -39,7 +40,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find user by username: " + username, e);
         }
         return Optional.empty();
     }
@@ -56,7 +57,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find user by email: " + email, e);
         }
         return Optional.empty();
     }
@@ -76,7 +77,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all users", e);
         }
         return users;
     }
@@ -91,7 +92,7 @@ public class UserDAOImpl implements UserDAO {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to count all users", e);
         }
         return 0;
     }
@@ -117,7 +118,7 @@ public class UserDAOImpl implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to create user: " + user.getUsername(), e);
         }
     }
 
@@ -134,7 +135,7 @@ public class UserDAOImpl implements UserDAO {
             stmt.setInt(6, user.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to update user: " + user.getId(), e);
         }
     }
 
@@ -146,7 +147,7 @@ public class UserDAOImpl implements UserDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to delete user: " + id, e);
         }
     }
 

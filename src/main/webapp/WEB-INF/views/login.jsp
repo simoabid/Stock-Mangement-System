@@ -16,8 +16,8 @@
         <div class="card">
             <h2 style="text-align: center; margin-bottom: var(--spacing-lg);"><fmt:message key="login.welcome" /></h2>
             <c:if test="${not empty error}"><div class="alert alert-error">${error}</div></c:if>
-            <c:if test="${param.msg == 'Registered'}"><div class="alert alert-success">Account created! Please sign in.</div></c:if>
-            <c:if test="${param.msg == 'LoggedOut'}"><div class="alert alert-success">You have been logged out.</div></c:if>
+            <c:if test="${param.msg == 'Registered'}"><div class="alert alert-success"><fmt:message key="msg.registered_success" /></div></c:if>
+            <c:if test="${param.msg == 'LoggedOut'}"><div class="alert alert-success"><fmt:message key="msg.logged_out" /></div></c:if>
             <form action="${pageContext.request.contextPath}/login" method="post">
                 <div class="form-group">
                     <label class="form-label"><fmt:message key="label.username" /></label>

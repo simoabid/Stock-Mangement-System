@@ -36,12 +36,22 @@ public class AuthenticationFilter implements Filter {
                 path.equals("/login") || path.equals("/register") || path.equals("/index.jsp");
 
         if (isLoggedIn) {
-            // Admin-only routes protection
+            // Role-based Access Control
             if (path.startsWith("/admin")) {
-                if (user.getRole() == User.Role.TECHNICIAN) {
-                    // Technicians cannot access admin routes
-                    res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-                    return;
+                // Strict admin-only operations (User Management, Category Management)
+                boolean isAdminOnly = path.startsWith("/admin/users") || path.startsWith("/admin/categories");
+                
+                if (isAdminOnly) {
+                    if (user.getRole() != User.Role.ADMIN) {
+                        res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Admin role required");
+                        return;
+                    }
+                } else {
+                    // Other admin/pharmacist areas (Stock entries, exits, suppliers, products management)
+                    if (user.getRole() == User.Role.TECHNICIAN) {
+                        res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Technician cannot access this area");
+                        return;
+                    }
                 }
             }
             // Logged in users shouldn't see login/register

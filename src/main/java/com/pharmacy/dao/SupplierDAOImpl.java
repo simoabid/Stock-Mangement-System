@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.Supplier;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class SupplierDAOImpl implements SupplierDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find supplier by id: " + id, e);
         }
         return Optional.empty();
     }
@@ -38,7 +39,7 @@ public class SupplierDAOImpl implements SupplierDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all suppliers", e);
         }
         return list;
     }
@@ -54,7 +55,7 @@ public class SupplierDAOImpl implements SupplierDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find active suppliers", e);
         }
         return list;
     }
@@ -77,7 +78,7 @@ public class SupplierDAOImpl implements SupplierDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to create supplier: " + supplier.getName(), e);
         }
     }
 
@@ -95,7 +96,7 @@ public class SupplierDAOImpl implements SupplierDAO {
             stmt.setInt(7, supplier.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to update supplier: " + supplier.getId(), e);
         }
     }
 
@@ -107,7 +108,7 @@ public class SupplierDAOImpl implements SupplierDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to delete supplier: " + id, e);
         }
     }
 

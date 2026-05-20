@@ -2,6 +2,7 @@ package com.pharmacy.dao;
 
 import com.pharmacy.model.Product;
 import com.pharmacy.util.DBConnection;
+import com.pharmacy.exception.DatabaseException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class ProductDAOImpl implements ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find product by id: " + id, e);
         }
         return Optional.empty();
     }
@@ -42,7 +43,7 @@ public class ProductDAOImpl implements ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all products with pagination", e);
         }
         return list;
     }
@@ -58,7 +59,7 @@ public class ProductDAOImpl implements ProductDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find all active products", e);
         }
         return list;
     }
@@ -99,7 +100,7 @@ public class ProductDAOImpl implements ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to search products", e);
         }
         return list;
     }
@@ -112,7 +113,7 @@ public class ProductDAOImpl implements ProductDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to count all products", e);
         }
         return 0;
     }
@@ -143,7 +144,7 @@ public class ProductDAOImpl implements ProductDAO {
                 if (rs.next()) return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to count searched products", e);
         }
         return 0;
     }
@@ -159,7 +160,7 @@ public class ProductDAOImpl implements ProductDAO {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to find low stock products", e);
         }
         return list;
     }
@@ -190,7 +191,7 @@ public class ProductDAOImpl implements ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to create product: " + product.getName(), e);
         }
     }
 
@@ -215,20 +216,31 @@ public class ProductDAOImpl implements ProductDAO {
             stmt.setInt(14, product.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to update product: " + product.getId(), e);
         }
     }
 
     @Override
     public void updateStock(int productId, int quantityChange) {
-        String sql = "UPDATE products SET current_stock = current_stock + ? WHERE id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection()) {
+            updateStock(productId, quantityChange, conn);
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to update stock for product: " + productId, e);
+        }
+    }
+
+    @Override
+    public void updateStock(int productId, int quantityChange, Connection conn) throws SQLException {
+        String sql = "UPDATE products SET current_stock = current_stock + ? WHERE id = ? AND (? >= 0 OR current_stock + ? >= 0)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, quantityChange);
             stmt.setInt(2, productId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            stmt.setInt(3, quantityChange);
+            stmt.setInt(4, quantityChange);
+            int rows = stmt.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insufficient stock or product not found for ID: " + productId);
+            }
         }
     }
 
@@ -240,7 +252,7 @@ public class ProductDAOImpl implements ProductDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("Failed to delete product: " + id, e);
         }
     }
 

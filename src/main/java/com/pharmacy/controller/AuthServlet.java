@@ -76,12 +76,42 @@ public class AuthServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
         }
     }
-
     private void handleRegister(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String fullname = req.getParameter("fullname");
         String email = req.getParameter("email");
+
+        if (username == null || username.trim().isEmpty() ||
+            password == null || password.trim().isEmpty() ||
+            fullname == null || fullname.trim().isEmpty() ||
+            email == null || email.trim().isEmpty()) {
+            req.setAttribute("error", "All fields are required");
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+            return;
+        }
+
+        username = username.trim();
+        fullname = fullname.trim();
+        email = email.trim();
+
+        if (username.length() < 3 || !username.matches("^[a-zA-Z0-9_]+$")) {
+            req.setAttribute("error", "Username must be at least 3 characters and contain only letters, numbers, or underscores");
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (password.length() < 6) {
+            req.setAttribute("error", "Password must be at least 6 characters long");
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+            return;
+        }
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            req.setAttribute("error", "Please provide a valid email address");
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+            return;
+        }
 
         if (userDAO.findByUsername(username).isPresent()) {
             req.setAttribute("error", "Username already exists");

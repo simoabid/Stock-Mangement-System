@@ -11,13 +11,35 @@ import java.util.UUID;
 
 public class FileUploadUtil {
 
+    private static final java.util.List<String> ALLOWED_EXTENSIONS = java.util.List.of("png", "jpg", "jpeg", "gif", "webp");
+
     public static String saveImage(Part filePart, ServletContext context) throws IOException {
         if (filePart == null || filePart.getSize() == 0 ||
                 filePart.getSubmittedFileName() == null || filePart.getSubmittedFileName().isEmpty()) {
             return null;
         }
 
-        String fileName = UUID.randomUUID().toString() + "_" + filePart.getSubmittedFileName();
+        String originalFileName = filePart.getSubmittedFileName();
+        
+        // Extract and validate extension
+        String extension = "";
+        int dotIndex = originalFileName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < originalFileName.length() - 1) {
+            extension = originalFileName.substring(dotIndex + 1).toLowerCase();
+        }
+
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            return null; // Reject non-image extension
+        }
+
+        // Validate MIME type
+        String contentType = filePart.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return null; // Reject if it's not declared as an image type
+        }
+
+        // Clean filename using UUID to prevent path traversal or duplicate issues
+        String fileName = UUID.randomUUID().toString() + "." + extension;
 
         // Save to runtime deployment directory
         String runtimePath = context.getRealPath("") + File.separator + "uploads";

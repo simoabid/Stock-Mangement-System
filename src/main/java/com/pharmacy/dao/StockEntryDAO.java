@@ -11,4 +11,5 @@ public interface StockEntryDAO {
     List<StockEntry> findExpired();
     int countAll();
     void create(StockEntry entry);
+    void create(StockEntry entry, java.sql.Connection conn) throws java.sql.SQLException;
 }

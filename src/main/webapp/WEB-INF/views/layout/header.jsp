@@ -47,12 +47,19 @@
                 <a href="${pageContext.request.contextPath}/register" class="btn btn-primary btn-sm"><fmt:message key="nav.getstarted" /></a>
             </c:if>
 
+            <script>
+                function changeLanguage(lang) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lang', lang);
+                    window.location.href = url.toString();
+                }
+            </script>
             <div style="display: flex; gap: 0.4rem; align-items: center; margin-left: 0.5rem;">
-                <a href="?lang=en" class="${sessionScope.userLang == 'en' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">EN</a>
+                <a href="javascript:changeLanguage('en')" class="${sessionScope.userLang == 'en' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">EN</a>
                 <span style="color: var(--border);">|</span>
-                <a href="?lang=fr" class="${sessionScope.userLang == 'fr' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">FR</a>
+                <a href="javascript:changeLanguage('fr')" class="${sessionScope.userLang == 'fr' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">FR</a>
                 <span style="color: var(--border);">|</span>
-                <a href="?lang=ar" class="${sessionScope.userLang == 'ar' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">AR</a>
+                <a href="javascript:changeLanguage('ar')" class="${sessionScope.userLang == 'ar' ? 'font-bold' : ''}" style="text-decoration: none; color: var(--text-muted); font-size: 0.8rem;">AR</a>
                 <button id="theme-toggle" class="btn btn-secondary btn-sm" style="margin-left: 0.3rem; padding: 0.3rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
